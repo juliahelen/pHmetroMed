@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.sax.StartElementListener;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -67,6 +68,11 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception E) {
             E.printStackTrace();
         }
+    }
+
+    public void configExame(View view){
+        Intent Intent = new Intent(this, ConfigurarExame.class);
+        startActivity(Intent);
     }
 
     public void tempo(){
