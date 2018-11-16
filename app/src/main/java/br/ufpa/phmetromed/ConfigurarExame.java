@@ -43,11 +43,9 @@ public class ConfigurarExame extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //executado ao clicar no botao
-            }
         });
 
     }
-
 
     public void Salvar(View view) throws ParseException {
 
