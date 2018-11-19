@@ -31,7 +31,9 @@ public class MainActivity extends AppCompatActivity {
     public String data_completa;
     public Date data_atual;
 
-    ConnectionThread connect;
+    public String enderecoBT = "";
+
+    public ConnectionThread connect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
