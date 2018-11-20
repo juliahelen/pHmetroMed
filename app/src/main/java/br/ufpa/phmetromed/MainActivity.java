@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        //int id = item.getItemId();
         //noinspection SimplifiableIfStatement
         //if (id == R.id.action_settings) {
         //    return true;
@@ -134,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("HandlerLeak")
     public static Handler handler = new Handler() {
+        @SuppressLint("SetTextI18n")
         @Override
         public void handleMessage(Message msg) {
             /* Esse método é invocado na Activity principal
@@ -141,27 +142,33 @@ public class MainActivity extends AppCompatActivity {
                 uma mensagem.
              */
             Bundle bundle = msg.getData();
-            byte[] data = bundle.getByteArray("data");
-            String dataString= new String(data);
+            byte[] data = null;
+            data = bundle.getByteArray("data");
+            String dataString= null;
+            if (data != null) {
+                dataString = new String(data);
+            }
             /* Aqui ocorre a decisão de ação, baseada na string
                 recebida. Caso a string corresponda à uma das
                 mensagens de status de conexão (iniciadas com --),
                 atualizamos o status da conexão conforme o código.
              */
-            if(dataString.equals("---N"))
-                statusMessage.setText("Ocorreu um erro durante a conexão D:");
-            else if(dataString.equals("---S"))
-                statusMessage.setText("Conectado :D");
-            else {
-                /* Se a mensagem não for um código de status,
-                    então ela deve ser tratada pelo aplicativo
-                    como uma mensagem vinda diretamente do outro
-                    lado da conexão. Nesse caso, simplesmente
-                    atualizamos o valor contido no TextView do
-                    contador.
-                 */
-                if(dataString.contains("PH")){
-                    viewPH.setText(dataString);
+            if (dataString != null) {
+                if(dataString.equals("---N"))
+                    statusMessage.setText("Ocorreu um erro durante a conexão D:");
+                else if(dataString.equals("---S"))
+                    statusMessage.setText("Conectado :D");
+                else {
+                    /* Se a mensagem não for um código de status,
+                        então ela deve ser tratada pelo aplicativo
+                        como uma mensagem vinda diretamente do outro
+                        lado da conexão. Nesse caso, simplesmente
+                        atualizamos o valor contido no TextView do
+                        contador.
+                     */
+                    if(dataString.contains("PH")){
+                        viewPH.setText(dataString);
+                    }
                 }
             }
         }
@@ -172,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(searchPairedDevicesIntent, SELECT_PAIRED_DEVICE);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
