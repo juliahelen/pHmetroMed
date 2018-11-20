@@ -1,17 +1,16 @@
 package br.ufpa.phmetromed;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-import android.sax.StartElementListener;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,13 +24,13 @@ public class MainActivity extends AppCompatActivity {
     public static int SELECT_PAIRED_DEVICE = 2;
     public static int SELECT_DISCOVERED_DEVICE = 3;
 
+    @SuppressLint("StaticFieldLeak")
     static TextView statusMessage;
+    @SuppressLint("StaticFieldLeak")
     static TextView viewPH;
 
-    public String data_completa;
+    public String data_completa, dia, hora;
     public Date data_atual;
-
-    public String enderecoBT = "";
 
     public ConnectionThread connect;
 
@@ -44,9 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
         viewPH = (TextView) findViewById(R.id.viewPH);
 
-
         /* Teste rápido. O hardware Bluetooth do dispositivo Android
-            está funcionando ou está bugado?
+            está funcionando ou está bugado
          */
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter == null) {
@@ -80,22 +78,19 @@ public class MainActivity extends AppCompatActivity {
     public void tempo(){
         try{
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-            // OU
-            //SimpleDateFormat dateFormat_hora = new SimpleDateFormat("HH:mm:ss");
+            SimpleDateFormat dateFormat_hora = new SimpleDateFormat("HH:mm:ss");
+            SimpleDateFormat dateFormat_dia = new SimpleDateFormat("dd-MM-yyyy");
 
             Date data = new Date();
-
             Calendar cal = Calendar.getInstance();
             cal.setTime(data);
             data_atual = cal.getTime();
 
             data_completa = dateFormat.format(data_atual);
-
-            //hora_atual = dateFormat_hora.format(data_atual);
+            dia = dateFormat_dia.format(data_atual);
+            hora = dateFormat_hora.format(data_atual);
 
             Log.i("data_completa", data_completa);
-            //Log.i("data_atual", data_atual.toString());
-            //Log.i("hora_atual", hora_atual); // Esse é o que você quer
         }catch (Exception e){
 
         }
@@ -129,20 +124,18 @@ public class MainActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         //if (id == R.id.action_settings) {
         //    return true;
         //}
-
         return super.onOptionsItemSelected(item);
     }
 
 
+    @SuppressLint("HandlerLeak")
     public static Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-
             /* Esse método é invocado na Activity principal
                 sempre que a thread de conexão Bluetooth recebe
                 uma mensagem.
@@ -150,7 +143,6 @@ public class MainActivity extends AppCompatActivity {
             Bundle bundle = msg.getData();
             byte[] data = bundle.getByteArray("data");
             String dataString= new String(data);
-
             /* Aqui ocorre a decisão de ação, baseada na string
                 recebida. Caso a string corresponda à uma das
                 mensagens de status de conexão (iniciadas com --),
@@ -161,11 +153,6 @@ public class MainActivity extends AppCompatActivity {
             else if(dataString.equals("---S"))
                 statusMessage.setText("Conectado :D");
             else {
-                if(dataString.contains("PH")){
-                    viewPH.setText(dataString);
-                }else{
-
-                }
                 /* Se a mensagem não for um código de status,
                     então ela deve ser tratada pelo aplicativo
                     como uma mensagem vinda diretamente do outro
@@ -173,13 +160,14 @@ public class MainActivity extends AppCompatActivity {
                     atualizamos o valor contido no TextView do
                     contador.
                  */
+                if(dataString.contains("PH")){
+                    viewPH.setText(dataString);
+                }
             }
-
         }
     };
 
     public void searchPairedDevices(View view) {
-
         Intent searchPairedDevicesIntent = new Intent(this, PairedDevices.class);
         startActivityForResult(searchPairedDevicesIntent, SELECT_PAIRED_DEVICE);
     }
