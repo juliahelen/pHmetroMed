@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
-public class ConfigurarExame extends AppCompatActivity {
+public class ConfigurarExame extends MainActivity{
 
     private long id;
     private String NomePaciente;
@@ -79,6 +79,7 @@ public class ConfigurarExame extends AppCompatActivity {
 
                     try {
                         // Envia para o arduino
+                        connect.write(cadastro.getBytes());
                         Toast.makeText(getApplicationContext(), "Enviar para o Arduino", Toast.LENGTH_SHORT).show();
                     }catch (Exception e){
                         Toast.makeText(getApplicationContext(), "ERRO ao enviar para o Arduino", Toast.LENGTH_SHORT).show();
