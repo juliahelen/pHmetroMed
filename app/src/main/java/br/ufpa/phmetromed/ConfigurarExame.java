@@ -1,6 +1,5 @@
 package br.ufpa.phmetromed;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -76,12 +75,13 @@ public class ConfigurarExame extends MainActivity{
                 if(test == 0){
                     String cadastro = "Id: "+ id +"\nNome: " + NomePaciente + "\nData de Nascimento: " + DataNascPaciente + "\nConvênio: " + Convenio + "\n";
                     Log.i("cadastro", cadastro);
-
+                    Log.i("btDevAddress: ", btDevAddress);
                     try {
                         // Envia para o arduino
-                        connect.write(cadastro.getBytes());
                         Toast.makeText(getApplicationContext(), "Enviar para o Arduino", Toast.LENGTH_SHORT).show();
                     }catch (Exception e){
+                        Log.e("Error", "exception: " + e.getMessage());
+                        Log.e("Error", "exception: " + e.toString());
                         Toast.makeText(getApplicationContext(), "ERRO ao enviar para o Arduino", Toast.LENGTH_SHORT).show();
                     }
                 }

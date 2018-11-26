@@ -11,14 +11,33 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
+
+    private long id;
+    private String NomePaciente;
+    private String DataNascPaciente;
+    //private Date DataNascPaciente;
+    private String Convenio;
+
+    private EditText editNomePaciente;
+    private EditText editDataNascPaciente;
+    private EditText editConvenio;
+
+    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy"); // Make sure user insert date into edittext in this format.
+
+    private Button salvarCadastro;
 
     public static int ENABLE_BLUETOOTH = 1;
     public static int SELECT_PAIRED_DEVICE = 2;
@@ -33,11 +52,69 @@ public class MainActivity extends AppCompatActivity {
     public Date data_atual;
 
     public ConnectionThread connect;
+    public String btDevAddress = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        editNomePaciente = (EditText) findViewById(R.id.editNomePaciente2);
+        editDataNascPaciente = (EditText) findViewById(R.id.editDataNascPaciente2);
+        editConvenio = (EditText) findViewById(R.id.editConvenio2);
+
+        this.salvarCadastro = (Button) findViewById(R.id.configurarExame);
+
+        this.salvarCadastro.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                //executado ao clicar no botao
+                int test = 0;
+                Random r = new Random();
+                id = r.nextInt(999999999);
+
+                if (!editNomePaciente.getText().toString().isEmpty()) {
+                    NomePaciente = editNomePaciente.getText().toString();
+                } else{
+                    Toast.makeText(getApplicationContext(), "Preencha o Nome do Paciente...", Toast.LENGTH_LONG).show();
+                    test = 1;
+                }
+                if(!editDataNascPaciente.getText().toString().isEmpty()) {
+                    //String datanasc = editDataNascPaciente.getText().toString();
+                    try {
+                        DataNascPaciente = editDataNascPaciente.getText().toString();//formatter.parse(datanasc);
+                    } catch (/*Parse*/Exception e) {
+                        e.printStackTrace();
+                    }
+                } else{
+                    Toast.makeText(getApplicationContext(), "Preencha a Data de Nascimento...", Toast.LENGTH_LONG).show();
+                    test = 1;
+                }
+                if (!editConvenio.getText().toString().isEmpty()) {
+                    Convenio = editConvenio.getText().toString();
+                } else{
+                    Toast.makeText(getApplicationContext(), "Preencha o Convênio...", Toast.LENGTH_LONG).show();
+                    test = 1;
+                }
+
+                if(test == 0){
+                    String cadastro = "Id: "+ id +"\nNome: " + NomePaciente + "\nData de Nascimento: " + DataNascPaciente + "\nConvênio: " + Convenio + "\n";
+                    Log.i("cadastro", cadastro);
+                    Log.i("btDevAddress: ", btDevAddress);
+                    try {
+                        // Envia para o arduino
+                        connect.write(cadastro.getBytes());
+                        Toast.makeText(getApplicationContext(), "Enviar para o Arduino", Toast.LENGTH_SHORT).show();
+                    }catch (Exception e){
+                        Log.e("Error", "exception: " + e.getMessage());
+                        Log.e("Error", "exception: " + e.toString());
+                        Toast.makeText(getApplicationContext(), "ERRO ao enviar para o Arduino", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+        });
 
         statusMessage = (TextView) findViewById(R.id.statusMessage);
 
@@ -71,8 +148,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void configExame(View view){
-        Intent Intent = new Intent(this, ConfigurarExame.class);
-        startActivity(Intent);
+        //Intent Intent = new Intent(this, ConfigurarExame.class);
+        //startActivity(Intent);
     }
 
     public void tempo(){
@@ -95,19 +172,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-    }
-
-    public void salvar(String texto){
-        tempo();
-        try{
-            if (true){ //função de salvar
-                Toast.makeText(MainActivity.this,"Salvo com sucesso!",Toast.LENGTH_SHORT).show();
-            }else{
-                Toast.makeText(MainActivity.this,"Erro ao salvar!",Toast.LENGTH_SHORT).show();
-            }
-        }catch (Exception e) {
-            Toast.makeText(MainActivity.this, "Erro ao salvar!", Toast.LENGTH_LONG).show();
-        }
     }
 
 
@@ -196,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
                 statusMessage.setText("Você selecionou " + data.getStringExtra("btDevName") + "\n"
                         + data.getStringExtra("btDevAddress"));
 
+                btDevAddress = data.getStringExtra("btDevAddress");
                 connect = new ConnectionThread(data.getStringExtra("btDevAddress"));
                 connect.start();
             } else {
