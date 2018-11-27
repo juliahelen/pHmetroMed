@@ -25,7 +25,6 @@
             android:name=".PairedDevices"
             android:label="Paired Devices"
             android:parentActivityName=".MainActivity"></activity>
-        <activity android:name=".ConfigurarExame"></activity>
     </application>
 
 </manifest>

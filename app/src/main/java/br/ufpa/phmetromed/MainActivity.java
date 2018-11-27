@@ -16,6 +16,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vicmikhailau.maskededittext.MaskedFormatter;
+import com.vicmikhailau.maskededittext.MaskedWatcher;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     private long id;
     private String NomePaciente;
     private String DataNascPaciente;
-    //private Date DataNascPaciente;
     private String Convenio;
 
     private EditText editNomePaciente;
@@ -59,9 +61,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editNomePaciente = (EditText) findViewById(R.id.editNomePaciente2);
-        editDataNascPaciente = (EditText) findViewById(R.id.editDataNascPaciente2);
-        editConvenio = (EditText) findViewById(R.id.editConvenio2);
+        editDataNascPaciente = (EditText) findViewById(R.id.editDataNascPaciente);
+        MaskedFormatter formatter = new MaskedFormatter("##/##/####");
+        editDataNascPaciente.addTextChangedListener(new MaskedWatcher(formatter, editDataNascPaciente));
+
+        editNomePaciente = (EditText) findViewById(R.id.editNomePaciente);
+        editConvenio = (EditText) findViewById(R.id.editConvenio);
 
         this.salvarCadastro = (Button) findViewById(R.id.configurarExame);
 
@@ -249,10 +254,10 @@ public class MainActivity extends AppCompatActivity {
 
         if(requestCode == ENABLE_BLUETOOTH) {
             if(resultCode == RESULT_OK) {
-                statusMessage.setText("Bluetooth ativado :D");
+                statusMessage.setText("Bluetooth ativado");
             }
             else {
-                statusMessage.setText("Bluetooth não ativado :(");
+                statusMessage.setText("Bluetooth não ativado");
             }
         }
         else if(requestCode == SELECT_PAIRED_DEVICE || requestCode == SELECT_DISCOVERED_DEVICE) {
@@ -264,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
                 connect = new ConnectionThread(data.getStringExtra("btDevAddress"));
                 connect.start();
             } else {
-                statusMessage.setText("Nenhum dispositivo selecionado :(");
+                statusMessage.setText("Nenhum dispositivo selecionado");
             }
         }
     }
