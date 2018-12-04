@@ -19,8 +19,6 @@ import android.widget.Toast;
 import com.vicmikhailau.maskededittext.MaskedFormatter;
 import com.vicmikhailau.maskededittext.MaskedWatcher;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -37,10 +35,6 @@ public class MainActivity extends AppCompatActivity {
     private EditText editDataNascPaciente;
     private EditText editConvenio;
 
-    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy"); // Make sure user insert date into edittext in this format.
-
-    private Button salvarCadastro;
-
     public static int ENABLE_BLUETOOTH = 1;
     public static int SELECT_PAIRED_DEVICE = 2;
     public static int SELECT_DISCOVERED_DEVICE = 3;
@@ -56,21 +50,22 @@ public class MainActivity extends AppCompatActivity {
     public ConnectionThread connect;
     public String btDevAddress = null;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editDataNascPaciente = (EditText) findViewById(R.id.editDataNascPaciente);
+        editDataNascPaciente = findViewById(R.id.editDataNascPaciente);
         MaskedFormatter formatter = new MaskedFormatter("##/##/####");
         editDataNascPaciente.addTextChangedListener(new MaskedWatcher(formatter, editDataNascPaciente));
 
-        editNomePaciente = (EditText) findViewById(R.id.editNomePaciente);
-        editConvenio = (EditText) findViewById(R.id.editConvenio);
+        editNomePaciente = findViewById(R.id.editNomePaciente);
+        editConvenio = findViewById(R.id.editConvenio);
 
-        this.salvarCadastro = (Button) findViewById(R.id.configurarExame);
+        Button salvarCadastro = findViewById(R.id.configurarExame);
 
-        this.salvarCadastro.setOnClickListener(new View.OnClickListener() {
+        salvarCadastro.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -86,10 +81,9 @@ public class MainActivity extends AppCompatActivity {
                     test = 1;
                 }
                 if(!editDataNascPaciente.getText().toString().isEmpty()) {
-                    //String datanasc = editDataNascPaciente.getText().toString();
                     try {
-                        DataNascPaciente = editDataNascPaciente.getText().toString();//formatter.parse(datanasc);
-                    } catch (/*Parse*/Exception e) {
+                        DataNascPaciente = editDataNascPaciente.getText().toString();
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else{
@@ -104,7 +98,10 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if(test == 0){
-                    String cadastro = "Id: "+ id +"\nNome: " + NomePaciente + "\nData de Nascimento: " + DataNascPaciente + "\nConvênio: " + Convenio + "\n";
+                    tempo();
+                    String cadastro = "Id: "+ id +"\nNome: " + NomePaciente + "\nData de Nascimento: "
+                            + DataNascPaciente + "\nConvênio: " + Convenio + "\n"+ "Início do Exame:" + data_completa + "\n";
+
                     Log.i("cadastro", cadastro);
                     Log.i("btDevAddress: ", btDevAddress);
                     try {
@@ -121,9 +118,9 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        statusMessage = (TextView) findViewById(R.id.statusMessage);
+        statusMessage = findViewById(R.id.statusMessage);
 
-        viewPH = (TextView) findViewById(R.id.viewPH);
+        viewPH = findViewById(R.id.viewPH);
 
         /* Teste rápido. O hardware Bluetooth do dispositivo Android
             está funcionando ou está bugado
@@ -135,12 +132,14 @@ public class MainActivity extends AppCompatActivity {
             statusMessage.setText("Ótimo! Hardware Bluetooth está funcionando :D");
         }
 
-        if(!btAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH);
-            statusMessage.setText("Solicitando ativação do Bluetooth...");
-        } else {
-            statusMessage.setText("Bluetooth já ativado :)");
+        if (btAdapter != null) {
+            if(!btAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH);
+                statusMessage.setText("Solicitando ativação do Bluetooth...");
+            } else {
+                statusMessage.setText("Bluetooth já ativado :)");
+            }
         }
 
         /* Um descanso rápido, para evitar bugs.
@@ -159,9 +158,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void tempo(){
         try{
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-            SimpleDateFormat dateFormat_hora = new SimpleDateFormat("HH:mm:ss");
-            SimpleDateFormat dateFormat_dia = new SimpleDateFormat("dd-MM-yyyy");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat_hora = new SimpleDateFormat("HH:mm:ss");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat_dia = new SimpleDateFormat("dd-MM-yyyy");
 
             Date data = new Date();
             Calendar cal = Calendar.getInstance();
@@ -173,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
             hora = dateFormat_hora.format(data_atual);
 
             Log.i("data_completa", data_completa);
-        }catch (Exception e){
+        }catch (Exception ignored){
 
         }
 
@@ -211,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
                 uma mensagem.
              */
             Bundle bundle = msg.getData();
-            byte[] data = null;
+            byte[] data;
             data = bundle.getByteArray("data");
             String dataString= null;
             if (data != null) {
@@ -223,11 +222,14 @@ public class MainActivity extends AppCompatActivity {
                 atualizamos o status da conexão conforme o código.
              */
             if (dataString != null) {
-                if(dataString.equals("---N"))
-                    statusMessage.setText("Ocorreu um erro durante a conexão D:");
-                else if(dataString.equals("---S"))
-                    statusMessage.setText("Conectado :D");
-                else {
+                switch (dataString) {
+                    case "---N":
+                        statusMessage.setText("Ocorreu um erro durante a conexão D:");
+                        break;
+                    case "---S":
+                        statusMessage.setText("Conectado :D");
+                        break;
+                    default:
                     /* Se a mensagem não for um código de status,
                         então ela deve ser tratada pelo aplicativo
                         como uma mensagem vinda diretamente do outro
@@ -235,9 +237,10 @@ public class MainActivity extends AppCompatActivity {
                         atualizamos o valor contido no TextView do
                         contador.
                      */
-                    if(dataString.contains("PH")){
-                        viewPH.setText(dataString);
-                    }
+                        if (dataString.contains("PH")) {
+                            viewPH.setText(dataString);
+                        }
+                        break;
                 }
             }
         }

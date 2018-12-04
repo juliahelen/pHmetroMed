@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">pHmetroMed</string>
+    <string name="nome_completo">Nome Completo</string>
+    <string name="data_de_nascimento">Data de Nascimento</string>
+    <string name="convenio">Convênio</string>
+    <string name="ph">PH</string>
+    <string name="phmetro">pHmetro</string>
+    <string name="dispositivos_pareados">Dispositivos Pareados</string>
+    <string name="configurar_exame">Configurar Exame</string>
+    <string name="sincronizar_data_hora">Sincronizar Data/Hora</string>
+    <string name="iniciar_exame">Iniciar Exame</string>
 </resources>
