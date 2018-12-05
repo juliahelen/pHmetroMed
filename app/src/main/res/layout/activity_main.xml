@@ -10,35 +10,6 @@
     tools:context=".MainActivity"
     android:background="#ffffff">
 
-    <EditText
-        android:id="@+id/editNomePaciente"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/button_PairedDevices"
-        android:hint="@string/nome_completo"
-        android:inputType="textPersonName" />
-
-    <EditText
-        android:id="@+id/editDataNascPaciente"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editNomePaciente"
-        android:hint="@string/data_de_nascimento"
-        android:inputType="date" />
-
-    <EditText
-        android:id="@+id/editConvenio"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editDataNascPaciente"
-        android:hint="@string/convenio"
-        android:inputType="text"
-        android:layout_alignParentLeft="true" />
 
     <TextView
         android:id="@+id/viewPH"
@@ -68,28 +39,32 @@
         android:onClick="searchPairedDevices"
         android:text="@string/dispositivos_pareados" />
 
-    <Button
-        android:id="@+id/configurarExame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/sincDataehora"
-        android:layout_centerHorizontal="true"
-        android:text="@string/configurar_exame" />
 
-    <Button
-        android:id="@+id/sincDataehora"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@+id/viewPH"
         android:layout_centerHorizontal="true"
-        android:text="@string/sincronizar_data_hora" />
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/iniciarExame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/configurarExame"
-        android:layout_centerHorizontal="true"
-        android:text="@string/iniciar_exame" />
+        <Button
+            android:id="@+id/configurarExame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/configurar_exame" />
+
+        <Button
+            android:id="@+id/sincDataehora"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sincronizar_data_hora" />
+
+        <Button
+            android:id="@+id/iniciarExame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/iniciar_exame" />
+
+    </LinearLayout>
 
 </RelativeLayout>

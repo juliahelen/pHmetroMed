@@ -29,16 +29,10 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    private long id;
+    private long id_exame;
     private String NomePaciente;
     private String DataNascPaciente;
     private String Convenio;
-
-    private EditText editNomePaciente;
-    private EditText editDataNascPaciente;
-    private EditText editConvenio;
-
-    public Button configExame;
 
     public static int ENABLE_BLUETOOTH = 1;
     public static int SELECT_PAIRED_DEVICE = 2;
@@ -48,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
     static TextView statusMessage;
     @SuppressLint("StaticFieldLeak")
     static TextView viewPH;
+
+    public Button configExame;
 
     public String data_completa, dia, hora;
     public Date data_atual;
@@ -61,70 +57,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editDataNascPaciente = findViewById(R.id.editDataNascPaciente);
-        MaskedFormatter formatter = new MaskedFormatter("##/##/####");
-        editDataNascPaciente.addTextChangedListener(new MaskedWatcher(formatter, editDataNascPaciente));
-
-        editNomePaciente = findViewById(R.id.editNomePaciente);
-        editConvenio = findViewById(R.id.editConvenio);
-
-        Button salvarCadastro = findViewById(R.id.configurarExame);
-
-        salvarCadastro.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                //executado ao clicar no botao
-                int test = 0;
-                Random r = new Random();
-                id = r.nextInt(999999999);
-
-                if (!editNomePaciente.getText().toString().isEmpty()) {
-                    NomePaciente = editNomePaciente.getText().toString();
-                } else{
-                    Toast.makeText(getApplicationContext(), "Preencha o Nome do Paciente...", Toast.LENGTH_LONG).show();
-                    test = 1;
-                }
-                if(!editDataNascPaciente.getText().toString().isEmpty()) {
-                    try {
-                        DataNascPaciente = editDataNascPaciente.getText().toString();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else{
-                    Toast.makeText(getApplicationContext(), "Preencha a Data de Nascimento...", Toast.LENGTH_LONG).show();
-                    test = 1;
-                }
-                if (!editConvenio.getText().toString().isEmpty()) {
-                    Convenio = editConvenio.getText().toString();
-                } else{
-                    Toast.makeText(getApplicationContext(), "Preencha o Convênio...", Toast.LENGTH_LONG).show();
-                    test = 1;
-                }
-
-                if(test == 0){
-                    tempo();
-                    String cadastro = "Id: "+ id +"\nNome: " + NomePaciente + "\nData de Nascimento: "
-                            + DataNascPaciente + "\nConvênio: " + Convenio + "\n"+ "Início do Exame:" + data_completa + "\n";
-
-                    Log.i("cadastro", cadastro);
-                    Log.i("btDevAddress: ", btDevAddress);
-                    try {
-                        // Envia para o arduino
-                        connect.write(cadastro.getBytes());
-                        Toast.makeText(getApplicationContext(), "Enviar para o Arduino", Toast.LENGTH_SHORT).show();
-                    }catch (Exception e){
-                        Log.e("Error", "exception: " + e.getMessage());
-                        Log.e("Error", "exception: " + e.toString());
-                        Toast.makeText(getApplicationContext(), "ERRO ao enviar para o Arduino", Toast.LENGTH_SHORT).show();
-                    }
+        configExame = findViewById(R.id.configurarExame);
+        configExame.setOnClickListener(new Button.OnClickListener()
+            {
+                @SuppressLint("SetTextI18n")
+                public void onClick(View v){
+                    showInputDialog();
                 }
             }
-
-        });
+        );
 
         statusMessage = findViewById(R.id.statusMessage);
-
         viewPH = findViewById(R.id.viewPH);
 
         /* Teste rápido. O hardware Bluetooth do dispositivo Android
@@ -156,22 +99,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //public void configExame(View view){
-        //Intent Intent = new Intent(this, ConfigurarExame.class);
-        //startActivity(Intent);
-    //}
-
-            configExame.setOnClickListener(new Button.OnClickListener()
-    {
-        @SuppressLint("SetTextI18n")
-        public void onClick(View v)
-        {
-            //acoes.setText("Configurar Exame");
-            showInputDialog();
-
-        }
-    }
-        );
 
     public void tempo(){
         try{
@@ -296,30 +223,71 @@ public class MainActivity extends AppCompatActivity {
 
     protected void showInputDialog() {
 
-        // get prompts.xml view
+        // get dialog_configurarexame.xml view
         LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
-        View promptView = layoutInflater.inflate(R.layout.dialog_configurarexame, null);
+        @SuppressLint("InflateParams") View promptView = layoutInflater.inflate(R.layout.dialog_configurarexame, null);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
         alertDialogBuilder.setView(promptView);
 
-        final EditText editText = (EditText) promptView.findViewById(R.id.configurarexame);
+        //Set campo
+        final EditText editDataNascPaciente = (EditText) promptView.findViewById(R.id.data_nascimento);
+        MaskedFormatter formatter = new MaskedFormatter("##/##/####");
+        editDataNascPaciente.addTextChangedListener(new MaskedWatcher(formatter, editDataNascPaciente));
+
+        final EditText editNomePaciente = (EditText) promptView.findViewById(R.id.nome_paciente);
+        final EditText editConvenio = (EditText) promptView.findViewById(R.id.convenio);
+
         // setup a dialog window
         alertDialogBuilder.setCancelable(false)
                 .setPositiveButton("Registrar", new DialogInterface.OnClickListener() {
                     @SuppressLint("SetTextI18n")
                     public void onClick(DialogInterface dialog, int id) {
 
-                        tempo();
-                        //acoes.setText("Sintoma: "+editText.getText()+"\n"+data_completa);
+                        //executado ao clicar no botao
+                        int test = 0;
 
-                        try{
-                            connect.write("Sintoma: ".getBytes());
-                            connect.write(String.valueOf(editText.getText()).getBytes());
-                            connect.write("; ".getBytes());
-                            connect.write(data_completa.getBytes());
-                            connect.write("\n".getBytes());
-                        }catch (Exception e){
-                            Toast.makeText(MainActivity.this,"Erro ao configurar, tente novamente.",Toast.LENGTH_LONG).show();
+                        if (!editNomePaciente.getText().toString().isEmpty()) {
+                            NomePaciente = editNomePaciente.getText().toString();
+
+                            if(!editDataNascPaciente.getText().toString().isEmpty()) {
+                                DataNascPaciente = editDataNascPaciente.getText().toString();
+
+                                if (!editConvenio.getText().toString().isEmpty()) {
+                                    Convenio = editConvenio.getText().toString();
+                                } else{
+                                    Toast.makeText(getApplicationContext(), "Preencha o Convênio...", Toast.LENGTH_SHORT).show();
+                                    test = 1;
+                                }
+
+                            } else{
+                                Toast.makeText(getApplicationContext(), "Preencha a Data de Nascimento...", Toast.LENGTH_SHORT).show();
+                                test = 1;
+                            }
+
+                        } else{
+                            Toast.makeText(getApplicationContext(), "Preencha o Nome do Paciente...", Toast.LENGTH_SHORT).show();
+                            test = 1;
+                        }
+
+                        if(test == 0){  //enviar
+                            Random r = new Random();
+                            id_exame = r.nextInt(999999999);
+                            tempo();
+
+                            String cadastro = "ID: "+ id_exame +"\nNome: " + NomePaciente + "\nData de Nascimento: "
+                                    + DataNascPaciente + "\nConvênio: " + Convenio + "\n"+ "Início do Exame:" + data_completa + "\n";
+
+                            Log.i("cadastro", cadastro);
+                            Log.i("btDevAddress: ", btDevAddress);
+                            try {
+                                // Envia para o arduino
+                                connect.write(cadastro.getBytes());
+                                Toast.makeText(getApplicationContext(), "Enviar para o Arduino", Toast.LENGTH_SHORT).show();
+                            }catch (Exception e){
+                                Log.e("Error", "exception: " + e.getMessage());
+                                Log.e("Error", "exception: " + e.toString());
+                                Toast.makeText(getApplicationContext(), "Erro ao configurar, tente novamente.", Toast.LENGTH_SHORT).show();
+                            }
                         }
 
                     }
