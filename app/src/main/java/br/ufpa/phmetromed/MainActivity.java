@@ -2,12 +2,15 @@ package br.ufpa.phmetromed;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText editNomePaciente;
     private EditText editDataNascPaciente;
     private EditText editConvenio;
+
+    public Button configExame;
 
     public static int ENABLE_BLUETOOTH = 1;
     public static int SELECT_PAIRED_DEVICE = 2;
@@ -151,10 +156,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void configExame(View view){
+    //public void configExame(View view){
         //Intent Intent = new Intent(this, ConfigurarExame.class);
         //startActivity(Intent);
+    //}
+
+            configExame.setOnClickListener(new Button.OnClickListener()
+    {
+        @SuppressLint("SetTextI18n")
+        public void onClick(View v)
+        {
+            //acoes.setText("Configurar Exame");
+            showInputDialog();
+
+        }
     }
+        );
 
     public void tempo(){
         try{
@@ -275,6 +292,48 @@ public class MainActivity extends AppCompatActivity {
                 statusMessage.setText("Nenhum dispositivo selecionado");
             }
         }
+    }
+
+    protected void showInputDialog() {
+
+        // get prompts.xml view
+        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+        View promptView = layoutInflater.inflate(R.layout.dialog_configurarexame, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setView(promptView);
+
+        final EditText editText = (EditText) promptView.findViewById(R.id.configurarexame);
+        // setup a dialog window
+        alertDialogBuilder.setCancelable(false)
+                .setPositiveButton("Registrar", new DialogInterface.OnClickListener() {
+                    @SuppressLint("SetTextI18n")
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        tempo();
+                        //acoes.setText("Sintoma: "+editText.getText()+"\n"+data_completa);
+
+                        try{
+                            connect.write("Sintoma: ".getBytes());
+                            connect.write(String.valueOf(editText.getText()).getBytes());
+                            connect.write("; ".getBytes());
+                            connect.write(data_completa.getBytes());
+                            connect.write("\n".getBytes());
+                        }catch (Exception e){
+                            Toast.makeText(MainActivity.this,"Erro ao configurar, tente novamente.",Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                })
+                .setNegativeButton("Cancelar",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        // create an alert dialog
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
     }
 }
 
