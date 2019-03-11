@@ -70,14 +70,11 @@ public class MainActivity extends AppCompatActivity {
         statusMessage = findViewById(R.id.statusMessage);
         viewPH = findViewById(R.id.viewPH);
 
-        /* Teste rápido. O hardware Bluetooth do dispositivo Android
-            está funcionando ou está bugado
-         */
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter == null) {
-            statusMessage.setText("Que pena! Hardware Bluetooth não está funcionando :(");
+            statusMessage.setText("Hardware Bluetooth não está funcionando");
         } else {
-            statusMessage.setText("Ótimo! Hardware Bluetooth está funcionando :D");
+            statusMessage.setText("Hardware Bluetooth está funcionando");
         }
 
         if (btAdapter != null) {
@@ -86,11 +83,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH);
                 statusMessage.setText("Solicitando ativação do Bluetooth...");
             } else {
-                statusMessage.setText("Bluetooth já ativado :)");
+                statusMessage.setText("Bluetooth já ativado");
             }
         }
 
-        /* Um descanso rápido, para evitar bugs.
+        /* Pausa para evitar bugs.
          */
         try {
             Thread.sleep(1000);
@@ -168,10 +165,10 @@ public class MainActivity extends AppCompatActivity {
             if (dataString != null) {
                 switch (dataString) {
                     case "---N":
-                        statusMessage.setText("Ocorreu um erro durante a conexão D:");
+                        statusMessage.setText("Ocorreu um erro durante a conexão");
                         break;
                     case "---S":
-                        statusMessage.setText("Conectado :D");
+                        statusMessage.setText("Conectado");
                         break;
                     default:
                     /* Se a mensagem não for um código de status,
